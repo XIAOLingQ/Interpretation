@@ -430,6 +430,11 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
         else if(content_str.contains("天气")){
+
+
+
+
+
             
             return;
         }
