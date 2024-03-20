@@ -444,8 +444,21 @@ public class MainActivity extends AppCompatActivity implements
 //        }
 
         //没找到关键词 就聊天模式
-        refresh("暂时还没有这个功能",ListData.RECEIVER);
-        starSpeech("暂时还没有这个功能");
+        QingyunkeChatBot qingyunkeChatBot = new QingyunkeChatBot();
+        qingyunkeChatBot.getResponse(content_str, new QingyunkeChatBot.ResponseListener() {
+            @Override
+            public void onResponseReceived(String response) {
+                // 处理响应字符串
+                refresh(response,ListData.RECEIVER);
+                starSpeech(response);
+            }
+
+            @Override
+            public void onError(String error) {
+                // 处理错误
+                Log.e("Error", error);
+            }
+        });
 
     }
 
