@@ -444,7 +444,8 @@ public class MainActivity extends AppCompatActivity implements
 //        }
 
         //没找到关键词 就聊天模式
-        chat();
+        refresh("暂时还没有这个功能",ListData.RECEIVER);
+        starSpeech("暂时还没有这个功能");
 
     }
 
