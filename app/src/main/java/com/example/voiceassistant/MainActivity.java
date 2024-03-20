@@ -409,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         //关键词"打开"
-        if (content_str.contains("打开")){
+        else if (content_str.contains("打开")){
             String appName= content_str.substring(content_str.indexOf("开")+1);
             Log.d("tag app name",appName);
             openApp(appName);
@@ -417,7 +417,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         //关键词"搜索"
-        if (content_str.contains("搜索")){
+        else if (content_str.contains("搜索")){
             String searchContent=content_str.substring(content_str.indexOf("索")+1);
 
             surfTheInternet(searchContent);
@@ -425,40 +425,37 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         //关键词"打电话"
-        if (content_str.contains("打电话")){
+        else if (content_str.contains("打电话")){
             call();
             return;
         }
-
+        else if(content_str.contains("天气")){
+            
+            return;
+        }
         //关键词"发短信"
-        if (content_str.contains("发短信")){
+        else if (content_str.contains("发短信")){
             getSendMsgContactInfo();
             return;
         }
-
-        //地图
-//        if(content_str.contains("地图")){
-//            Uri uri = Uri.parse("androidamap://poi?sourceApplication=语音助手&keywords="+content_str+"&dev=0");
-//            startActivity(new Intent(Intent.ACTION_VIEW, uri));
-//            return;
-//        }
-
         //没找到关键词 就聊天模式
-        QingyunkeChatBot qingyunkeChatBot = new QingyunkeChatBot();
-        qingyunkeChatBot.getResponse(content_str, new QingyunkeChatBot.ResponseListener() {
-            @Override
-            public void onResponseReceived(String response) {
+        else{
+            QingyunkeChatBot qingyunkeChatBot = new QingyunkeChatBot();
+            qingyunkeChatBot.getResponse(content_str, new QingyunkeChatBot.ResponseListener() {
+                @Override
+                public void onResponseReceived(String response) {
                 // 处理响应字符串
-                refresh(response,ListData.RECEIVER);
-                starSpeech(response);
-            }
+                    refresh(response,ListData.RECEIVER);
+                    starSpeech(response);
+                }
 
-            @Override
-            public void onError(String error) {
-                // 处理错误
-                Log.e("Error", error);
-            }
-        });
+                @Override
+                public void onError(String error) {
+                    // 处理错误
+                    Log.e("Error", error);
+                }
+            });
+        }
 
     }
 
