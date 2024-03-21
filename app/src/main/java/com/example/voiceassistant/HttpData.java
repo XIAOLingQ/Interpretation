@@ -61,11 +61,6 @@ public class HttpData extends AsyncTask<String, Void, String>{
 		super.onPostExecute(result);
 	}
 
-	/**
-	 * 拼接url
-	 * @param msg
-	 * @return
-	 */
 	public static String setParams(String msg) {
 		String url = "";
 		try {

@@ -111,8 +111,6 @@ public class MainActivity extends AppCompatActivity implements
         adapter = new TextAdapter(lists, this);
         lv.setAdapter(adapter);
         ListData listData;
-//        listData = new ListData(getRandomWelcomeTips(), ListData.RECEIVER,
-//                getTime());
         listData = new ListData("有什么我可以帮到你的吗？", ListData.RECEIVER,
                 getTime());
         lists.add(listData);

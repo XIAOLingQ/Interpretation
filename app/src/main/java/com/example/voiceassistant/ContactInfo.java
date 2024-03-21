@@ -1,8 +1,5 @@
 package com.example.voiceassistant;
 
-/**
- * Created by Administrator on 2017/2/9.
- */
 
 //联系人信息类
 public class ContactInfo {
