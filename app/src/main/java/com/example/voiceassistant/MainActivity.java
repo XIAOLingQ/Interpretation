@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initView() {
         // 初始化即创建语音配置对象，只有初始化后才可以使用MSC的各项服务
-        SpeechUtility.createUtility(this, SpeechConstant.APPID +"=5c773723");
+        SpeechUtility.createUtility(this, SpeechConstant.APPID +"=f921cd8e");
         // 语音听写 1.创建SpeechRecognizer对象，第二个参数：本地听写时传InitListener
         mIat = SpeechRecognizer.createRecognizer(this, mTtsInitListener);
         // 带UI 1.创建RecognizerDialog对象，第二个参数：本地听写时传InitListener
@@ -203,7 +203,8 @@ public class MainActivity extends AppCompatActivity implements
      * @Description:
      */
     private void starWrite() {
-
+        mIat.setParameter( SpeechConstant.CLOUD_GRAMMAR, null );
+        mIat.setParameter( SpeechConstant.SUBJECT, null );
         // 语音识别应用领域（：iat，search，video，poi，music）
         mIat.setParameter(SpeechConstant.DOMAIN, "iat");
         // 接收语言中文
@@ -419,6 +420,7 @@ public class MainActivity extends AppCompatActivity implements
             String searchContent=content_str.substring(content_str.indexOf("索")+1);
 
             surfTheInternet(searchContent);
+
             return;
         }
 
@@ -593,7 +595,6 @@ public class MainActivity extends AppCompatActivity implements
         // 去掉回车
         String droph = dropk.replace("\n", "");
         httpData = (HttpData) new HttpData(droph, this).execute();
-
         // RxVolley,网络请求库 具体网上查
 //        String url = "http://www.tuling123.com/openapi/api?key=dce266d8ca114296b3fe5f0fd600de3b&info=" + droph;
 //        RxVolley.get(url, new HttpCallback() {
@@ -604,7 +605,6 @@ public class MainActivity extends AppCompatActivity implements
 //                        pasingJson(t);
 //                    }
 //                });
-
     }
 
     /**
@@ -638,28 +638,4 @@ public class MainActivity extends AppCompatActivity implements
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         // 此处为android 6.0以上动态授权的回调，用户自行实现。
     }
-
-    // 定义录音的动态权限
-//    private void soundPermissions() {
-//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this, new String[]{
-//                    android.Manifest.permission.RECORD_AUDIO}, 1);
-//        }
-//    }
-//
-//    /**
-//     * 重写onRequestPermissionsResult方法
-//     * 获取动态权限请求的结果,再开启录音
-//     */
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//
-//        } else {
-//            Toast.makeText(this, "用户拒绝了权限", Toast.LENGTH_SHORT).show();
-//        }
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//    }
-
 }
