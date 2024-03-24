@@ -431,7 +431,10 @@ public class MainActivity extends AppCompatActivity implements
         }
         else if(content_str.contains("天气")){
 
-            
+
+
+
+
             return;
         }
         //关键词"发短信"
