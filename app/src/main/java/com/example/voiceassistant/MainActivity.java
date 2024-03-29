@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -38,6 +39,12 @@ import com.iflytek.cloud.SpeechUtility;
 import com.iflytek.cloud.SynthesizerListener;
 import com.iflytek.cloud.ui.RecognizerDialog;
 import com.iflytek.cloud.ui.RecognizerDialogListener;
+import com.iflytek.sparkchain.core.LLM;
+import com.iflytek.sparkchain.core.LLMConfig;
+import com.iflytek.sparkchain.core.LLMOutput;
+import com.iflytek.sparkchain.core.Memory;
+import com.iflytek.sparkchain.core.SparkChain;
+import com.iflytek.sparkchain.core.SparkChainConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +56,6 @@ import java.util.EventListener;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-
 public class MainActivity extends AppCompatActivity implements
         HttpGetDataListener, View.OnClickListener {
 
@@ -79,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements
     private boolean isMessage=false;//判断是否是短信内容的标志
     private String msg_number;//发短信时的联系人电话
     private String msg_name;//发短信时的联系人名字
+    private LLMConfig llmConfig;
+    private LLM llm;
+    private int ret;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +96,15 @@ public class MainActivity extends AppCompatActivity implements
         // 定义获取录音的动态权限
         initPermission();
         initView();
+        SparkChainConfig config =  SparkChainConfig.builder()
+                .appID("f921cd8e")
+                .apiKey("ZDJhZWZhOWFiZmUxMTdmNzllOTBkYzAy")
+                .apiSecret("c5a224ff88254fc96c60850ae901fa68");//从平台获取的授权appid，apikey,apisecrety
+        ret = SparkChain.getInst().init(getApplicationContext(), config);
+        llmConfig = LLMConfig.builder();
+        llmConfig.domain("generalv3.5");
+        llmConfig.url("https://spark-api.xf-yun.com/v3.5/chat");//如果使用generalv2，domain和url都可缺省，SDK默认；如果使用general，url可缺省，SDK会自动补充；如果是其他，则需要设置domain和url。
+        llm = new LLM(llmConfig);
     }
 
     private void initView() {
@@ -444,21 +462,36 @@ public class MainActivity extends AppCompatActivity implements
         }
         //没找到关键词 就聊天模式
         else{
-            QingyunkeChatBot qingyunkeChatBot = new QingyunkeChatBot();
-            qingyunkeChatBot.getResponse(content_str, new QingyunkeChatBot.ResponseListener() {
-                @Override
-                public void onResponseReceived(String response) {
-                // 处理响应字符串
-                    refresh(response,ListData.RECEIVER);
-                    starSpeech(response);
-                }
+//            QingyunkeChatBot qingyunkeChatBot = new QingyunkeChatBot();
+//            qingyunkeChatBot.getResponse(content_str, new QingyunkeChatBot.ResponseListener() {
+//                @Override
+//                public void onResponseReceived(String response) {
+//                // 处理响应字符串
+//                    refresh(response,ListData.RECEIVER);
+//                    starSpeech(response);
+//                }
+//
+//                @Override
+//                public void onError(String error) {
+//                    // 处理错误
+//                    Log.e("Error", error);
+//                }
+//            });
 
-                @Override
-                public void onError(String error) {
-                    // 处理错误
-                    Log.e("Error", error);
-                }
-            });
+
+            String question1 = "上海有什么景点？";
+            LLMOutput syncOutput = llm.run(question1);
+            if(syncOutput.getErrCode() == 0) {
+                Log.i(TAG, "同步调用：" +  syncOutput.getRole() + ":" + syncOutput.getContent());
+                String response = syncOutput.getContent();
+                refresh(response,ListData.RECEIVER);
+                starSpeech(response);
+            }else {
+                Log.e(TAG, "同步调用：" +  "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg());
+                refresh("同步调用：" +  "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg(),ListData.RECEIVER);
+                starSpeech("同步调用：" +  "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg());
+            }
+            return;
         }
 
     }
