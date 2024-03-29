@@ -98,12 +98,12 @@ public class MainActivity extends AppCompatActivity implements
         initView();
         SparkChainConfig config =  SparkChainConfig.builder()
                 .appID("f921cd8e")
-                .apiKey("ZDJhZWZhOWFiZmUxMTdmNzllOTBkYzAy")
-                .apiSecret("c5a224ff88254fc96c60850ae901fa68");//从平台获取的授权appid，apikey,apisecrety
+                .apiKey("c5a224ff88254fc96c60850ae901fa68")
+                .apiSecret("ZDJhZWZhOWFiZmUxMTdmNzllOTBkYzAy");//从平台获取的授权appid，apikey,apisecrety
         ret = SparkChain.getInst().init(getApplicationContext(), config);
         llmConfig = LLMConfig.builder();
-        llmConfig.domain("generalv3.5");
-        llmConfig.url("https://spark-api.xf-yun.com/v3.5/chat");//如果使用generalv2，domain和url都可缺省，SDK默认；如果使用general，url可缺省，SDK会自动补充；如果是其他，则需要设置domain和url。
+        llmConfig.domain("generalv3");
+        llmConfig.url("http://spark-api.xf-yun.com/v3.1/chat");//如果使用generalv2，domain和url都可缺省，SDK默认；如果使用general，url可缺省，SDK会自动补充；如果是其他，则需要设置domain和url。
         llm = new LLM(llmConfig);
     }
 
@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements
                 getTime());
         lists.add(listData);
         starSpeech("有什么我可以帮到你的吗?");
+
     }
 
     @Override
@@ -479,8 +480,7 @@ public class MainActivity extends AppCompatActivity implements
 //            });
 
 
-            String question1 = "上海有什么景点？";
-            LLMOutput syncOutput = llm.run(question1);
+            LLMOutput syncOutput = llm.run(content_str);
             if(syncOutput.getErrCode() == 0) {
                 Log.i(TAG, "同步调用：" +  syncOutput.getRole() + ":" + syncOutput.getContent());
                 String response = syncOutput.getContent();
