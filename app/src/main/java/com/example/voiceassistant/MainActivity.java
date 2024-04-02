@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements
     // 1 默认 许久 青年男声 中英文（普通话） aisjiuxu
     private String[] voiceName = { "xiaoyan", "aisjiuxu","xiaomei"};
 
-    private HttpData httpData;
     private List<ListData> lists;
     private ListView lv;
     private String content_str;
@@ -625,23 +624,6 @@ public class MainActivity extends AppCompatActivity implements
         starSpeech(text);
     }
 
-    public void chat(){
-        // 去掉空格
-        String dropk = content_str.replace(" ", "");
-        // 去掉回车
-        String droph = dropk.replace("\n", "");
-        httpData = (HttpData) new HttpData(droph, this).execute();
-        // RxVolley,网络请求库 具体网上查
-//        String url = "http://www.tuling123.com/openapi/api?key=dce266d8ca114296b3fe5f0fd600de3b&info=" + droph;
-//        RxVolley.get(url, new HttpCallback() {
-//                    @Override
-//                    public void onSuccess(String t) {
-//                        //解析返回的JSON数据
-//                        Log.d(TAG,t);
-//                        pasingJson(t);
-//                    }
-//                });
-    }
 
     /**
      * android 6.0 以上需要动态申请权限
