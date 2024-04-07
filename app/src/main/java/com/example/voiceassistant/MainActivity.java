@@ -46,11 +46,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -423,7 +421,6 @@ public class MainActivity extends AppCompatActivity implements
         if (isMessage) {
             sendMessage(content_str);
             isMessage = false;
-            return;
         }
 
         //关键词"打开"
@@ -431,7 +428,6 @@ public class MainActivity extends AppCompatActivity implements
             String appName = content_str.substring(content_str.indexOf("开") + 1);
             Log.d("tag app name", appName);
             openApp(appName);
-            return;
         }
 
         //关键词"搜索"
@@ -440,22 +436,18 @@ public class MainActivity extends AppCompatActivity implements
 
             surfTheInternet(searchContent);
 
-            return;
         }
 
         //关键词"打电话"
         else if (content_str.contains("打电话")) {
             call();
-            return;
         } else if (content_str.contains("天气")) {
 
 
-            return;
         }
         //关键词"发短信"
         else if (content_str.contains("发短信")) {
             getSendMsgContactInfo();
-            return;
         }
         //没找到关键词 就聊天模式
         else {
