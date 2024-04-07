@@ -30,6 +30,5 @@ dependencies {
     implementation files('libs/Msc.jar')
     implementation files('libs/SparkChain.aar')
     implementation 'com.kymjs.rxvolley:rxvolley:1.1.4'
-    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
-
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }

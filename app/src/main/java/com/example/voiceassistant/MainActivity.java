@@ -2,7 +2,6 @@ package com.example.voiceassistant;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -11,10 +10,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -42,13 +39,14 @@ import com.iflytek.cloud.ui.RecognizerDialogListener;
 import com.iflytek.sparkchain.core.LLM;
 import com.iflytek.sparkchain.core.LLMConfig;
 import com.iflytek.sparkchain.core.LLMOutput;
-import com.iflytek.sparkchain.core.Memory;
 import com.iflytek.sparkchain.core.SparkChain;
 import com.iflytek.sparkchain.core.SparkChainConfig;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements
     private SpeechSynthesizer mTts;// 语音合成
     // 0 小燕 青年女声 中英文（普通话） xiaoyan
     // 1 默认 许久 青年男声 中英文（普通话） aisjiuxu
-    private String[] voiceName = { "xiaoyan", "aisjiuxu","xiaomei"};
+    private String[] voiceName = {"xiaoyan", "aisjiuxu", "xiaomei"};
 
     private List<ListData> lists;
     private ListView lv;
@@ -81,12 +79,13 @@ public class MainActivity extends AppCompatActivity implements
     private double currentTime = 0, oldTime = 0;
 
     private boolean flag = false;   //语音听写完后，防止多次识别标识
-    private boolean isMessage=false;//判断是否是短信内容的标志
+    private boolean isMessage = false;//判断是否是短信内容的标志
     private String msg_number;//发短信时的联系人电话
     private String msg_name;//发短信时的联系人名字
     private LLMConfig llmConfig;
     private LLM llm;
     private int ret;
+    private int t;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements
         // 定义获取录音的动态权限
         initPermission();
         initView();
-        SparkChainConfig config =  SparkChainConfig.builder()
+        SparkChainConfig config = SparkChainConfig.builder()
                 .appID("f921cd8e")
                 .apiKey("c5a224ff88254fc96c60850ae901fa68")
                 .apiSecret("ZDJhZWZhOWFiZmUxMTdmNzllOTBkYzAy");//从平台获取的授权appid，apikey,apisecrety
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initView() {
         // 初始化即创建语音配置对象，只有初始化后才可以使用MSC的各项服务
-        SpeechUtility.createUtility(this, SpeechConstant.APPID +"=f921cd8e");
+        SpeechUtility.createUtility(this, SpeechConstant.APPID + "=f921cd8e");
         // 语音听写 1.创建SpeechRecognizer对象，第二个参数：本地听写时传InitListener
         mIat = SpeechRecognizer.createRecognizer(this, mTtsInitListener);
         // 带UI 1.创建RecognizerDialog对象，第二个参数：本地听写时传InitListener
@@ -145,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements
             JSONObject jb = new JSONObject(str);
             String text = jb.getString("text");
 
-            refresh(text,ListData.RECEIVER);
+            refresh(text, ListData.RECEIVER);
 
             // 语音合成
             starSpeech(text);
@@ -169,7 +168,9 @@ public class MainActivity extends AppCompatActivity implements
         getTime();
     }
 
-    /** 获取时间 */
+    /**
+     * 获取时间
+     */
     private String getTime() {
         currentTime = System.currentTimeMillis();
         SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
@@ -185,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    public void refresh(String text,int flag){
+    public void refresh(String text, int flag) {
         ListData listData;
         listData = new ListData(text, flag, getTime());
         lists.add(listData);
@@ -221,8 +222,8 @@ public class MainActivity extends AppCompatActivity implements
      * @Description:
      */
     private void starWrite() {
-        mIat.setParameter( SpeechConstant.CLOUD_GRAMMAR, null );
-        mIat.setParameter( SpeechConstant.SUBJECT, null );
+        mIat.setParameter(SpeechConstant.CLOUD_GRAMMAR, null);
+        mIat.setParameter(SpeechConstant.SUBJECT, null);
         // 语音识别应用领域（：iat，search，video，poi，music）
         mIat.setParameter(SpeechConstant.DOMAIN, "iat");
         // 接收语言中文
@@ -236,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements
         iatDialog.setListener(mRecognizerDialogListener);
         iatDialog.show();
 
-        tv_textlink = (TextView)iatDialog.getWindow().getDecorView().findViewWithTag("textlink");
+        tv_textlink = (TextView) iatDialog.getWindow().getDecorView().findViewWithTag("textlink");
         tv_textlink.setText("");
         tv_textlink.getPaint().setFlags(Paint.SUBPIXEL_TEXT_FLAG);
         tv_textlink.setEnabled(false);
@@ -262,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements
         // 会话发生错误回调接口
         public void onError(SpeechError error) {
             // 错误码：10118(您没有说话)，可能是录音机权限被禁，需要提示用户打开应用的录音权限。
-            if(error.getErrorCode()==10118){
+            if (error.getErrorCode() == 10118) {
                 Toast.makeText(getApplicationContext(), "你好像没有说话哦",
                         Toast.LENGTH_SHORT).show();
             }
@@ -293,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void onVolumeChanged(int volume, byte[] data) {
             // TODO Auto-generated method stub
-            Log.d(TAG, "当前说话音量大小"+volume);
+            Log.d(TAG, "当前说话音量大小" + volume);
 
         }
 
@@ -308,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements
             // 一般情况下会通过onResults接口多次返回结果，完整的识别内容是多次结果的累加；
             // 关于解析Json的代码可参见MscDemo中JsonParser类；
             // isLast等于true时会话结束。
-            if(flag){
+            if (flag) {
                 getMsg(results);
             }
         }
@@ -319,17 +320,17 @@ public class MainActivity extends AppCompatActivity implements
         public void onError(SpeechError error) {
             //Toast.makeText(getApplication(), error.getPlainDescription(true), Toast.LENGTH_SHORT).show();
             if (error.getErrorCode() == 14002) {
-                Toast.makeText(getApplication(),error.getPlainDescription(true) + "\n请确认是否已开通翻译功能", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplication(), error.getPlainDescription(true) + "\n请确认是否已开通翻译功能", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getApplication(),error.getPlainDescription(true), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplication(), error.getPlainDescription(true), Toast.LENGTH_SHORT).show();
             }
 
             /**
              * 过滤掉没有说话的错误码显示
              */
-            TextView tv_error = (TextView)iatDialog.getWindow().getDecorView().findViewWithTag("errtxt");
+            TextView tv_error = (TextView) iatDialog.getWindow().getDecorView().findViewWithTag("errtxt");
             // 错误码：10118(您没有说话)，可能是录音机权限被禁，需要提示用户打开应用的录音权限。
-            if(tv_error != null && error.getErrorCode()==10118){
+            if (tv_error != null && error.getErrorCode() == 10118) {
                 tv_error.setText("您好像没有说话哦...");
             }
         }
@@ -343,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements
         // 会话结束回调接口，没有错误时，error为null
         public void onCompleted(SpeechError error) {
             if (error != null) {
-                Log.d(TAG, error.getErrorCode()+ "");
+                Log.d(TAG, error.getErrorCode() + "");
             } else {
                 Log.d(TAG, "0");
             }
@@ -415,27 +416,27 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         content_str = resultBuffer.toString();
-        refresh(content_str,ListData.SEND);
+        refresh(content_str, ListData.SEND);
 
 
         //如果是发送的短信内容，必须写在最前面，防止短信内容里面出现关键词
-        if (isMessage){
+        if (isMessage) {
             sendMessage(content_str);
-            isMessage=false;
+            isMessage = false;
             return;
         }
 
         //关键词"打开"
-        else if (content_str.contains("打开")){
-            String appName= content_str.substring(content_str.indexOf("开")+1);
-            Log.d("tag app name",appName);
+        else if (content_str.contains("打开")) {
+            String appName = content_str.substring(content_str.indexOf("开") + 1);
+            Log.d("tag app name", appName);
             openApp(appName);
             return;
         }
 
         //关键词"搜索"
-        else if (content_str.contains("搜索")){
-            String searchContent=content_str.substring(content_str.indexOf("索")+1);
+        else if (content_str.contains("搜索")) {
+            String searchContent = content_str.substring(content_str.indexOf("索") + 1);
 
             surfTheInternet(searchContent);
 
@@ -443,25 +444,21 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         //关键词"打电话"
-        else if (content_str.contains("打电话")){
+        else if (content_str.contains("打电话")) {
             call();
             return;
-        }
-        else if(content_str.contains("天气")){
-
-
-
+        } else if (content_str.contains("天气")) {
 
 
             return;
         }
         //关键词"发短信"
-        else if (content_str.contains("发短信")){
+        else if (content_str.contains("发短信")) {
             getSendMsgContactInfo();
             return;
         }
         //没找到关键词 就聊天模式
-        else{
+        else {
 //            QingyunkeChatBot qingyunkeChatBot = new QingyunkeChatBot();
 //            qingyunkeChatBot.getResponse(content_str, new QingyunkeChatBot.ResponseListener() {
 //                @Override
@@ -477,23 +474,71 @@ public class MainActivity extends AppCompatActivity implements
 //                    Log.e("Error", error);
 //                }
 //            });
+            emotion.getResponseInBackground(text, new emotion.ResponseCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    // 处理成功的响应
+                    System.out.println("Success: " + response);
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(response);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
 
+                    // 获取 "items" 数组
+                    JSONArray itemsArray = null;
+                    try {
+                        itemsArray = jsonObject.getJSONArray("items");
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // 获取数组中的第一个元素
+                    JSONObject firstItem = null;
+                    try {
+                        firstItem = itemsArray.getJSONObject(0);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // 从第一个元素中获取 "sentiment" 字段的值
+                    try {
+                        t = firstItem.getInt("sentiment");
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                @Override
+                public void onError(String error) {
+                    // 处理错误
+                    System.err.println("Error: " + error);
+                }
+            });
+            String emo="";
+            if (t == 0)
+                emo = "(我的情绪:负向,跟我聊聊吧)";
+            else if (t == 1)
+                emo = "(我的情绪:中性,跟我聊聊吧)";
+            else if (t == 2)
+                emo = "(我的情绪:正向,跟我聊聊吧)";
+            content_str = text + emo;
 
             LLMOutput syncOutput = llm.run(content_str);
-            if(syncOutput.getErrCode() == 0) {
-                Log.i(TAG, "同步调用：" +  syncOutput.getRole() + ":" + syncOutput.getContent());
+            if (syncOutput.getErrCode() == 0) {
+                Log.i(TAG, "同步调用：" + syncOutput.getRole() + ":" + syncOutput.getContent());
                 String response = syncOutput.getContent();
-                refresh(response,ListData.RECEIVER);
+                refresh(response, ListData.RECEIVER);
                 starSpeech(response);
-            }else {
-                Log.e(TAG, "同步调用：" +  "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg());
-                refresh("同步调用：" +  "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg(),ListData.RECEIVER);
-                starSpeech("同步调用：" +  "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg());
+            } else {
+                Log.e(TAG, "同步调用：" + "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg());
+                refresh("同步调用：" + "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg(), ListData.RECEIVER);
+                starSpeech("同步调用：" + "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg());
             }
             return;
         }
-
     }
+
+
 
     //打开应用
     private void openApp(String appName) {
