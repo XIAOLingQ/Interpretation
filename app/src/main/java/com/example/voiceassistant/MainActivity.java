@@ -441,8 +441,15 @@ public class MainActivity extends AppCompatActivity implements
         //关键词"打电话"
         else if (content_str.contains("打电话")) {
             call();
-        } else if (content_str.contains("天气")) {
-
+        }
+        //关键词"您能干什么"
+        else if (content_str.contains("你能干什么")) {
+            String help="1.打电话给某人\n2.发信息给某人\n3.浏览器搜索\n4.打开app\n5.聊天";
+            refresh(help, ListData.RECEIVER);
+            starSpeech(help);
+        }
+        //关键词"闹钟"
+        else if (content_str.contains("闹钟")) {
 
         }
         //关键词"发短信"
@@ -466,54 +473,74 @@ public class MainActivity extends AppCompatActivity implements
 //                    Log.e("Error", error);
 //                }
 //            });
-            emotion.getResponseInBackground(text, new emotion.ResponseCallback() {
-                @Override
-                public void onSuccess(String response) {
-                    // 处理成功的响应
-                    System.out.println("Success: " + response);
-                    JSONObject jsonObject = null;
-                    try {
-                        jsonObject = new JSONObject(response);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    // 获取 "items" 数组
-                    JSONArray itemsArray = null;
-                    try {
-                        itemsArray = jsonObject.getJSONArray("items");
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                    // 获取数组中的第一个元素
-                    JSONObject firstItem = null;
-                    try {
-                        firstItem = itemsArray.getJSONObject(0);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                    // 从第一个元素中获取 "sentiment" 字段的值
-                    try {
-                        t = firstItem.getInt("sentiment");
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                @Override
-                public void onError(String error) {
-                    // 处理错误
-                    System.err.println("Error: " + error);
-                }
-            });
-            String emo="";
-            if (t == 0)
-                emo = "(我的情绪:负向,跟我聊聊吧)";
-            else if (t == 1)
-                emo = "(我的情绪:中性,跟我聊聊吧)";
-            else if (t == 2)
-                emo = "(我的情绪:正向,跟我聊聊吧)";
-            content_str = text + emo;
+//            emotion.getResponseInBackground(text, new emotion.ResponseCallback() {
+//                @Override
+//                public void onSuccess(String response) {
+//                    // 处理成功的响应
+//                    JSONObject jsonObject = null;
+//                    try {
+//                        jsonObject = new JSONObject(response);
+//                    } catch (JSONException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//
+//                    // 获取 "items" 数组
+//                    JSONArray itemsArray = null;
+//                    try {
+//                        itemsArray = jsonObject.getJSONArray("items");
+//                    } catch (JSONException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    // 获取数组中的第一个元素
+//                    JSONObject firstItem = null;
+//                    try {
+//                        firstItem = itemsArray.getJSONObject(0);
+//                    } catch (JSONException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    // 从第一个元素中获取 "sentiment" 字段的值
+//                        double maxProb = 0;
+//                        double secondMaxProb = 0;
+//                        int maxSentiment = -1;
+//
+//                    JSONArray items = null;
+//                    try {
+//                        items = firstItem.getJSONArray("items");
+//                    } catch (JSONException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    for (int i = 0; i < items.length(); i++) {
+//                            JSONObject item = items.getJSONObject(i);
+//                            double positiveProb = item.getDouble("positive_prob");
+//                            if (positiveProb > maxProb) {
+//                                secondMaxProb = maxProb;
+//                                maxProb = positiveProb;
+//                                maxSentiment = item.getInt("sentiment");
+//                            } else if (positiveProb > secondMaxProb) {
+//                                secondMaxProb = positiveProb;
+//                            }
+//                        }
+//
+//                        if (maxProb - secondMaxProb > 0.15) {
+//                            t=maxSentiment;
+//                        } else {
+//                            t=1; // 中性情感值
+//                        }
+//                }
+//
+//                @Override
+//                public void onError(String error) {
+//                    // 处理错误
+//                }
+//            });
+//            String emo="";
+//            if (t == 0)
+//                emo = "(我的情绪:负向,跟我聊聊吧)";
+//            else if (t == 1)
+//                emo = "(我的情绪:中性,跟我聊聊吧)";
+//            else if (t == 2)
+//                emo = "(我的情绪:正向,跟我聊聊吧)";
+//            content_str = text + emo;
 
             LLMOutput syncOutput = llm.run(content_str);
             if (syncOutput.getErrCode() == 0) {
@@ -526,7 +553,6 @@ public class MainActivity extends AppCompatActivity implements
                 refresh("同步调用：" + "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg(), ListData.RECEIVER);
                 starSpeech("同步调用：" + "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg());
             }
-            return;
         }
     }
 
