@@ -542,6 +542,7 @@ public class MainActivity extends AppCompatActivity implements
 //                emo = "(我的情绪:正向,跟我聊聊吧)";
 //            content_str = text + emo;
 
+            content_str=content_str+"(简要说明最多400字)";
             LLMOutput syncOutput = llm.run(content_str);
             if (syncOutput.getErrCode() == 0) {
                 Log.i(TAG, "同步调用：" + syncOutput.getRole() + ":" + syncOutput.getContent());

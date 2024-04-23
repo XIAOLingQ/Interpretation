@@ -73,5 +73,4 @@ class emotion {
     public interface ResponseCallback {
         void onSuccess(String response);
         void onError(String error);
-    }
-}
+    }}
