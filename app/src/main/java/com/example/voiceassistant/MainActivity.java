@@ -542,15 +542,13 @@ public class MainActivity extends AppCompatActivity implements
 //                emo = "(我的情绪:正向,跟我聊聊吧)";
 //            content_str = text + emo;
 
-            content_str=content_str+"(简要说明最多400字)";
+            content_str=content_str+"(请简要说明最多400字)";
             LLMOutput syncOutput = llm.run(content_str);
             if (syncOutput.getErrCode() == 0) {
-                Log.i(TAG, "同步调用：" + syncOutput.getRole() + ":" + syncOutput.getContent());
                 String response = syncOutput.getContent();
                 refresh(response, ListData.RECEIVER);
                 starSpeech(response);
             } else {
-                Log.e(TAG, "同步调用：" + "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg());
                 refresh("同步调用：" + "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg(), ListData.RECEIVER);
                 starSpeech("同步调用：" + "errCode" + syncOutput.getErrCode() + " errMsg:" + syncOutput.getErrMsg());
             }
