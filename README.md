@@ -21,4 +21,4 @@ Interpretation 是一个基于讯飞云的语音助手项目，旨在提供便�
 1. 克隆本仓库到本地：
 
 ```bash
-https://github.com/dewfewg/Interpretation.git
+git clone https://github.com/dewfewg/Interpretation.git
